@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visitor Info</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6 mt-10">
+    <h1 class="text-2xl font-bold mb-4">Visitor Info</h1>
+    <ul class="space-y-2">
+      <li class="border-b pb-2"><strong>IP Address:</strong> {{ ip }}</li>
+      <li class="border-b pb-2"><strong>City:</strong> {{ city }}</li>
+      <li class="border-b pb-2"><strong>Region:</strong> {{ region }}</li>
+      <li class="border-b pb-2"><strong>Country:</strong> {{ country }}</li>
+      <li class="border-b pb-2"><strong>ISP:</strong> {{ isp }}</li>
+      <li class="border-b pb-2"><strong>Latitude:</strong> {{ latitude }}</li>
+      <li class="border-b pb-2"><strong>Longitude:</strong> {{ longitude }}</li>
+    </ul>
+  </div>
+</body>
+</html>

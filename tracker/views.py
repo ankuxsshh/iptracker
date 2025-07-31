@@ -3,7 +3,6 @@ from django.shortcuts import render
 from .models import VisitorLog
 
 def get_client_ip(request):
-    """Get client IP address, handling proxy headers."""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -11,46 +10,39 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-def track_ip(request):
+def track_page(request):
     ip = get_client_ip(request)
-
-    # Set default fallback values
-    location_info = {
-        "IP Address": ip,
-        "City": "Unknown",
-        "Region": "Unknown",
-        "Country": "Unknown",
-        "ISP": "Unknown",
-    }
+    city = region = country = isp = latitude = longitude = None
 
     try:
-        # Using ipinfo.io (or switch to ipapi.co if needed)
-        response = requests.get(f'https://ipinfo.io/{ip}/json')
-        data = response.json()
+        res = requests.get(f'https://ipinfo.io/{ip}/json')
+        data = res.json()
+        city = data.get('city')
+        region = data.get('region')
+        country = data.get('country')
+        isp = data.get('org')
+        loc = data.get('loc')  # returns "lat,long"
+        if loc:
+            latitude, longitude = loc.split(',')
+    except:
+        pass
 
-        city = data.get("city")
-        region = data.get("region")
-        country = data.get("country")
-        org = data.get("org")
+    VisitorLog.objects.create(
+        ip=ip,
+        city=city,
+        region=region,
+        country=country,
+        isp=isp,
+        latitude=latitude,
+        longitude=longitude
+    )
 
-        # Update the dictionary
-        location_info.update({
-            "City": city,
-            "Region": region,
-            "Country": country,
-            "ISP": org,
-        })
-
-        # Log to DB
-        VisitorLog.objects.create(
-            ip=ip,
-            city=city,
-            region=region,
-            country=country,
-            isp=org
-        )
-
-    except Exception as e:
-        location_info["Error"] = f"Failed to fetch location data: {str(e)}"
-
-    return render(request, 'track_result.html', {"location_info": location_info})
+    return render(request, 'track.html', {
+        'ip': ip,
+        'city': city,
+        'region': region,
+        'country': country,
+        'isp': isp,
+        'latitude': latitude,
+        'longitude': longitude
+    })
